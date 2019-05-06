@@ -1,21 +1,31 @@
-package statistics
+package main
 
 import (
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
+	"os"
+	"strconv"
 	"strings"
 )
 
 var bot *tgbotapi.BotAPI
+var TELEGRAM_TOKEN = "741657632:AAHvcdm18EySo9uJ-ftHXEHl2ISxZvnFbXI"
 
-
-func statistics() {
+func main() {
+	dbopen()
+	args := os.Args
+	if args != nil && len(args) == 2 {
+		dbinit(args[1])
+		TELEGRAM_TOKEN = args[1]
+	}
+	dbread()
+	dbcron()
 	start()
 }
 
 
 func start() {
-	bott, err := tgbotapi.NewBotAPI(token)
+	bott, err := tgbotapi.NewBotAPI(TELEGRAM_TOKEN)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -48,41 +58,60 @@ func start() {
 				msg.Text = "本机器人专为羊毛群设计,用以统计大家都喜欢买啥东西"
 				sendmsg(msg)
 			case "day":
+				msg.Text = topKey("day")
+				sendmsg(msg)
 			case "week":
+				msg.Text = topKey("week")
+				sendmsg(msg)
 			case "month":
+				msg.Text = topKey("month")
+				sendmsg(msg)
 			case "year":
+				msg.Text = topKey("year")
+				sendmsg(msg)
 			default:
 
 			}
 		} else {
-			msg := update.Message.Text
-			if strings.HasPrefix(msg,"找") {
-				//是关键词, 开始记录
+			text := update.Message.Text
+			if strings.HasPrefix(text,string('找')) {
+				isKeyword(string([]rune(text)[1:]))
 			}
 		}
 	}
 }
 
 
+func topKey(unit string) string{
+	kvs := dbFetchTopKeyword(unit, 20)
+	str := ""
+	for _,v := range kvs {
+		str = str + "\r\n" +strconv.Itoa(v.count)  +"\t"+v.keyword
+	}
+	return str
+}
+
 func isKeyword(word string) {
-	isold := checkWord(word)
-	if isold {
-		oldkeyWord(word)
-	} else {
-		newkeyWord(word)
+	if word != "" {
+		isold := hasWord(word)
+		if isold {
+			oldkeyWord(word)
+		} else {
+			newkeyWord(word)
+		}
 	}
 }
 
-func checkWord(word string) bool {
-	return false
+func hasWord(word string) bool {
+	return dbHasKeyword(word)
 }
 
 func newkeyWord(word string) {
-
+	dbNewKeyword(word)
 }
 
 func oldkeyWord(word string) {
-
+	dbKeywordInc(word)
 }
 
 func checkAdmin(admins []tgbotapi.ChatMember, who tgbotapi.User) bool {
