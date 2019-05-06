@@ -47,30 +47,52 @@ func start() {
 
 		//判断是否是服务群,如果不是则退出
 		gid := update.Message.Chat.ID
-		if gid != 123456666 {
-			//退出群组或者停止聊天
+		if gid>0 && (gid != int64(667918518) && gid!=int64(779814472) && gid != 731400898) {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "本机器人不想跟你说话")
+			sendmsg(msg)
+			continue
 		}
 
 		if update.Message.IsCommand() {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-			switch update.Message.Command() {
-			case "start", "help":
-				msg.Text = "本机器人专为羊毛群设计,用以统计大家都喜欢买啥东西"
-				sendmsg(msg)
-			case "day":
-				msg.Text = topKey("day")
-				sendmsg(msg)
-			case "week":
-				msg.Text = topKey("week")
-				sendmsg(msg)
-			case "month":
-				msg.Text = topKey("month")
-				sendmsg(msg)
-			case "year":
-				msg.Text = topKey("year")
-				sendmsg(msg)
-			default:
+			if update.Message.Chat.IsPrivate() {
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+				order := update.Message.CommandArguments()
+				num,numerr := strconv.Atoi(order)
+				switch update.Message.Command() {
+				case "start", "help":
+					msg.Text = "本机器人专为羊毛群设计,用以统计大家都喜欢买啥东西"
+					sendmsg(msg)
+				case "day":
+					if numerr==nil{
+						msg.Text = topKey("day", num)
+					}else {
+						msg.Text = topKey("day", 20)
+					}
+					sendmsg(msg)
+				case "week":
+					if numerr==nil{
+						msg.Text = topKey("week", num)
+					}else {
+						msg.Text = topKey("week", 20)
+					}
+					sendmsg(msg)
+				case "month":
+					if numerr==nil{
+						msg.Text = topKey("month", num)
+					}else {
+						msg.Text = topKey("month", 20)
+					}
+					sendmsg(msg)
+				case "year":
+					if numerr==nil{
+						msg.Text = topKey("year", num)
+					}else {
+						msg.Text = topKey("year", 20)
+					}
+					sendmsg(msg)
+				default:
 
+				}
 			}
 		} else {
 			text := update.Message.Text
@@ -82,8 +104,14 @@ func start() {
 }
 
 
-func topKey(unit string) string{
-	kvs := dbFetchTopKeyword(unit, 20)
+func topKey(unit string, limit int) string{
+	var kvs []kc
+	if limit!=0{
+		kvs = dbFetchTopKeyword(unit, limit)
+	} else {
+		kvs = dbFetchTopKeyword(unit, 20)
+	}
+
 	str := ""
 	for _,v := range kvs {
 		str = str + "\r\n" +strconv.Itoa(v.count)  +"\t"+v.keyword
