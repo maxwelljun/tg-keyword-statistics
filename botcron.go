@@ -6,8 +6,16 @@ import (
 
 func dbcron() {
 	c := cron.New()
+
+	//every hour
+	_ = c.AddFunc("@hourly", func() {
+		pushHourly()
+		dbKeyword0("hour")
+	})
+
 	//every day 00:00
 	_ = c.AddFunc("@daily", func() {
+		pushDayly()
 		dbKeyword0("day")
 	})
 	//every month 00:00 no.1

@@ -23,7 +23,6 @@ func main() {
 	start()
 }
 
-
 func start() {
 	bott, err := tgbotapi.NewBotAPI(TELEGRAM_TOKEN)
 	if err != nil {
@@ -34,7 +33,6 @@ func start() {
 	bot.Debug = true
 
 	log.Printf("Authorized on account: %s  ID: %d", bot.Self.UserName, bot.Self.ID)
-
 
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
@@ -47,7 +45,7 @@ func start() {
 
 		//判断是否是服务群,如果不是则退出
 		gid := update.Message.Chat.ID
-		if gid>0 && (gid != int64(667918518) && gid!=int64(779814472) && gid != 731400898) {
+		if gid > 0 && (gid != int64(667918518) && gid != int64(779814472) && gid != 731400898) {
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "本机器人不想跟你说话")
 			sendmsg(msg)
 			continue
@@ -57,43 +55,50 @@ func start() {
 			if update.Message.Chat.IsPrivate() {
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 				order := update.Message.CommandArguments()
-				num,numerr := strconv.Atoi(order)
+				num, numerr := strconv.Atoi(order)
 				switch update.Message.Command() {
 				case "start", "help":
 					msg.Text = "本机器人专为羊毛群设计,用以统计大家都喜欢买啥东西"
 					sendmsg(msg)
+				case "hour":
+					if numerr == nil {
+						msg.Text = topKey("hour", num)
+					} else {
+						msg.Text = topKey("hour", 20)
+					}
+					sendmsg(msg)
 				case "day":
-					if numerr==nil{
+					if numerr == nil {
 						msg.Text = topKey("day", num)
-					}else {
+					} else {
 						msg.Text = topKey("day", 20)
 					}
 					sendmsg(msg)
 				case "week":
-					if numerr==nil{
+					if numerr == nil {
 						msg.Text = topKey("week", num)
-					}else {
+					} else {
 						msg.Text = topKey("week", 20)
 					}
 					sendmsg(msg)
 				case "month":
-					if numerr==nil{
+					if numerr == nil {
 						msg.Text = topKey("month", num)
-					}else {
+					} else {
 						msg.Text = topKey("month", 20)
 					}
 					sendmsg(msg)
 				case "year":
-					if numerr==nil{
+					if numerr == nil {
 						msg.Text = topKey("year", num)
-					}else {
+					} else {
 						msg.Text = topKey("year", 20)
 					}
 					sendmsg(msg)
 				case "sum":
-					if numerr==nil{
+					if numerr == nil {
 						msg.Text = topKey("sum", num)
-					}else {
+					} else {
 						msg.Text = topKey("sum", 20)
 					}
 					sendmsg(msg)
@@ -103,25 +108,39 @@ func start() {
 			}
 		} else {
 			text := update.Message.Text
-			if strings.HasPrefix(text,string('找')) {
+			if strings.HasPrefix(text, string('找')) {
 				isKeyword(string([]rune(text)[1:]))
 			}
 		}
 	}
 }
 
-
-func topKey(unit string, limit int) string{
+func topKey(unit string, limit int) string {
 	var kvs []kc
 	sumquery := dbCountQuery(unit)
-	if limit!=0{
+	if limit != 0 {
 		kvs = dbFetchTopKeyword(unit, limit)
 	} else {
 		kvs = dbFetchTopKeyword(unit, 20)
 	}
-	str := "查询总次数: "+strconv.Itoa(sumquery)+"次\r\n"
-	for _,v := range kvs {
-		str = str + "\r\n" +strconv.Itoa(v.count)  +"\t"+v.keyword
+	var unitstr string
+	switch unit {
+	case "year":
+		unitstr = "今年"
+	case "month":
+		unitstr = "这个月"
+	case "week":
+		unitstr = "这个周"
+	case "day":
+		unitstr = "今天"
+	case "sum":
+		unitstr = "这辈子"
+	case "hour":
+		unitstr = "这个小时"
+	}
+	str := unitstr + "查询总次数: " + strconv.Itoa(sumquery) + "次\r\n"
+	for _, v := range kvs {
+		str = str + "\r\n" + strconv.Itoa(v.count) + "\t" + v.keyword
 	}
 	return str
 }
@@ -150,28 +169,37 @@ func oldkeyWord(word string) {
 }
 
 func checkAdmin(admins []tgbotapi.ChatMember, who tgbotapi.User) bool {
-	for _,user := range admins{
-		if who==*user.User {
+	for _, user := range admins {
+		if who == *user.User {
 			return true
 		}
 	}
 	return false
 }
 
+func pushDayly() {
+	msg := tgbotapi.NewMessage(731400898, "")
+	msg.Text = topKey("month", 20)
+	sendmsg(msg)
+	msg.Text = topKey("week", 20)
+	sendmsg(msg)
+	msg.Text = topKey("day", 20)
+	sendmsg(msg)
+}
+
+func pushHourly() {
+	msg := tgbotapi.NewMessage(731400898, "")
+	msg.Text = topKey("hour", 20)
+	sendmsg(msg)
+}
 
 func sendmsg(msg tgbotapi.MessageConfig) tgbotapi.Message {
-	if msg.Text==""{
+	if msg.Text == "" {
 		msg.Text = "出现错误,请联系 @veezer"
 	}
-	mmsg, err := bot.Send(msg);
-	if  err != nil {
+	mmsg, err := bot.Send(msg)
+	if err != nil {
 		log.Println(err)
 	}
 	return mmsg
 }
-
-
-
-
-
-
