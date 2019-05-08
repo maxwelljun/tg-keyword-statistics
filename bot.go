@@ -90,6 +90,13 @@ func start() {
 						msg.Text = topKey("year", 20)
 					}
 					sendmsg(msg)
+				case "sum":
+					if numerr==nil{
+						msg.Text = topKey("sum", num)
+					}else {
+						msg.Text = topKey("sum", 20)
+					}
+					sendmsg(msg)
 				default:
 
 				}
@@ -106,13 +113,13 @@ func start() {
 
 func topKey(unit string, limit int) string{
 	var kvs []kc
+	sumquery := dbCountQuery(unit)
 	if limit!=0{
 		kvs = dbFetchTopKeyword(unit, limit)
 	} else {
 		kvs = dbFetchTopKeyword(unit, 20)
 	}
-
-	str := ""
+	str := "查询总次数: "+strconv.Itoa(sumquery)+"次\r\n"
 	for _,v := range kvs {
 		str = str + "\r\n" +strconv.Itoa(v.count)  +"\t"+v.keyword
 	}

@@ -42,7 +42,7 @@ keyword string
 }
 
 func dbFetchTopKeyword(unit string, limit int) []kc {
-	rows, err := db.Query("SELECT keyword,"+ unit +"count FROM main.statistics order by "+ unit+"count desc limit 0,"+strconv.Itoa(limit))
+	rows, err := db.Query("SELECT keyword,"+ unit +"count FROM main.statistics WHERE "+unit+"count>0 order by "+ unit+"count desc limit 0,"+strconv.Itoa(limit))
 	checkErr(err)
 	var count int
 	var keyword string
@@ -54,6 +54,18 @@ func dbFetchTopKeyword(unit string, limit int) []kc {
 	}
 	rows.Close()
 	return kcs
+}
+
+func dbCountQuery(unit string) int {
+	rows, err := db.Query("SELECT sum("+ unit +"count) as sumquery FROM main.statistics WHERE "+unit+"count>0")
+	checkErr(err)
+	var sumquery int
+	if rows.Next() {
+		err = rows.Scan(&sumquery)
+		checkErr(err)
+	}
+	rows.Close()
+	return sumquery
 }
 
 
