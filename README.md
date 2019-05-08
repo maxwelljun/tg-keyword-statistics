@@ -8,6 +8,7 @@
 ### 安装依赖
 - `go get -u github.com/mattn/go-sqlite3`
 - `go get -u github.com/go-telegram-bot-api/telegram-bot-api`
+- `github.com/robfig/cron`
 
 ### 编译
 在代码文件路径下运行 `go build ./`
