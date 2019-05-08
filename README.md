@@ -14,8 +14,8 @@
 
 
 ## 使用方法
-- 初次使用 `./tg-keyword-reply tg-bot-token` , 会将token存到数据库中
-- 后面使用 `./tg-keyword-reply` , 无需输入token
+- 初次使用 `./statistics tg-bot-token` , 会将token存到数据库中
+- 后面使用 `./statistics` , 无需输入token
 - 统计方法: 按照"找手电筒"这种格式的关键词会被统计在内,关键词是"手电筒"
 - 查询方法: 拥有相关查询权限的人可以使用命令 `/hour` `/day` `/week` `/month` `/year` `/sum` 查询相关结果. 默认返回前20条,可以添加返回数量的参数,例如`/day 101`
 
