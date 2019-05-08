@@ -4,7 +4,7 @@
 - 自助查询相关统计结果
 - 每个小时\每天 自动推送相关结果
 
-##编译
+## 编译
 ### 安装依赖
 - `go get -u github.com/mattn/go-sqlite3`
 - `go get -u github.com/go-telegram-bot-api/telegram-bot-api`
