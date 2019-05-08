@@ -178,7 +178,7 @@ func checkAdmin(admins []tgbotapi.ChatMember, who tgbotapi.User) bool {
 }
 
 func pushDayly() {
-	msg := tgbotapi.NewMessage(731400898, "")
+	msg := tgbotapi.NewMessage(667918518, "")
 	msg.Text = topKey("month", 20)
 	sendmsg(msg)
 	msg.Text = topKey("week", 20)
@@ -188,7 +188,7 @@ func pushDayly() {
 }
 
 func pushHourly() {
-	msg := tgbotapi.NewMessage(731400898, "")
+	msg := tgbotapi.NewMessage(667918518, "")
 	msg.Text = topKey("hour", 20)
 	sendmsg(msg)
 }
